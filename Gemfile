@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Declare your gem's dependencies in test_plugin.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
-#gemspec
+
 
 # Declare any dependencies that are still in development here instead of in
 # your gemspec. These might include edge Rails or gems from your path or
@@ -15,3 +15,5 @@ source "https://rubygems.org"
 
 gem 'ruby-openam-auth', git: 'https://github.com/xelwarto/ruby-openam-auth.git'
 gem 'ruby-ldap-ext', git: 'https://github.com/xelwarto/ruby-ldap-ext.git'
+
+gemspec
