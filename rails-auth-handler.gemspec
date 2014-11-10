@@ -17,6 +17,4 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "README.md"]
 
   spec.add_dependency "rails", "~> 4.1.7"
-  spec.add_dependency 'ruby-openam-auth', git: 'https://github.com/xelwarto/ruby-openam-auth.git'
-  #spec.add_dependency 'ruby-ldap-ext'
 end

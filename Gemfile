@@ -13,5 +13,5 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
-#gem 'ruby-openam-auth', git: 'https://github.com/xelwarto/ruby-openam-auth.git'
-#gem 'ruby-ldap-ext', git: 'https://github.com/xelwarto/ruby-ldap-ext.git'
+gem 'ruby-openam-auth', git: 'https://github.com/xelwarto/ruby-openam-auth.git'
+gem 'ruby-ldap-ext', git: 'https://github.com/xelwarto/ruby-ldap-ext.git'
