@@ -14,12 +14,10 @@ module RailsAuth
         auth_valid
       else
         RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):Validating user authentication information'
-        auth = OpenAM::Auth::API.instance
 
-        token = cookies[auth.cookie_name.to_sym]
-        if verify_token token
+        if verify_token
           RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):SSO token validation successful'
-          sso_id = verify_user token
+          sso_id = verify_user
 
           if sso_id.nil?
             RailsAuth.logger.error 'RailsAuth::Handler(verify_auth):error retrieving SSO id'
