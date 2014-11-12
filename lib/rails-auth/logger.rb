@@ -10,6 +10,7 @@ module RailsAuth
 			if !@logger.nil?
 				@logger.send(name,opts)
 			end
+			puts opts
 		end
 
 		alias method_missing log
