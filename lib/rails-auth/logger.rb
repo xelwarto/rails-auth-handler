@@ -8,7 +8,7 @@ module RailsAuth
 
 		def log(name, *opts)
 			if !@logger.nil?
-				@logger.send(name,opts.first)
+				@logger.tagger('RailsAuth') { }@logger.send(name,opts.first) }
 			end
 		end
 
