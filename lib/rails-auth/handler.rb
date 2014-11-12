@@ -7,6 +7,7 @@ module RailsAuth
       c = RailsAuth.config
 
       if !c.dev_mode.nil? && c.dev_mode
+        RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):Development mode enabled - Authentication bypassed'
         session[c.session_user.to_sym] = c.dev_user
         session[c.session_dn.to_sym] = c.dev_dn
         session[c.session_mail.to_sym] = c.dev_mail
