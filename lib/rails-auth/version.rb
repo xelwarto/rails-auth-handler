@@ -1,5 +1,5 @@
 module RailsAuth
-  VERSION = "0.1.15"
+  VERSION = "0.1.16"
   NAME    = 'rails-auth-handler'
   AUTHOR  = 'Ted Elwartowski'
   EMAIL   = '<xelwarto.pub@gmail.com>'
