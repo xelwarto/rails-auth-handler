@@ -23,14 +23,16 @@ module RailsAuth
 end
 
 RailsAuth.configure do |c|
-	c.logger  			= nil
+	c.logger  				= nil
 
-	c.dev_mode 			= false
-	c.dev_user 			= nil
-	c.dev_dn	 			= nil
-	c.dev_mail 			= nil
+	c.cookie_doamin 	= nil
 
-	c.session_user 	= 'railsauth::session::user'
-	c.session_dn 		= 'railsauth::session::dn'
-	c.session_mail 	= 'railsauth::session::mail'
+	c.dev_mode 				= false
+	c.dev_user 				= nil
+	c.dev_dn	 				= nil
+	c.dev_mail 				= nil
+
+	c.session_user 		= 'railsauth::session::user'
+	c.session_dn 			= 'railsauth::session::dn'
+	c.session_mail 		= 'railsauth::session::mail'
 end

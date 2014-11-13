@@ -116,7 +116,13 @@ module RailsAuth
       auth = OpenAM::Auth::API.instance
 
       token_valid = false
-      token = cookies[auth.cookie_name.to_sym]
+      token = nil
+      begin
+        token = cookies[auth.cookie_name.to_sym]
+      rescue Exception => e
+        RailsAuth.logger.error "RailsAuth::Handler(verify_token):#{e}"
+        token = nil
+      end
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(verify_token):SSO token set to: #{token}"
@@ -138,7 +144,13 @@ module RailsAuth
       auth = OpenAM::Auth::API.instance
 
       sso_id = nil
-      token = cookies[auth.cookie_name.to_sym]
+      token = nil
+      begin
+        token = cookies[auth.cookie_name.to_sym]
+      rescue Exception => e
+        RailsAuth.logger.error "RailsAuth::Handler(verify_user):#{e}"
+        token = nil
+      end
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(verify_user):SSO token set to: #{token}"
@@ -163,15 +175,94 @@ module RailsAuth
       sso_id
     end
 
-    def auth_login(opts=nil)
-      auth = OpenAM::Auth::API.instance
+    def sso_login(username=nil,password=nil)
+      RailsAuth.logger.debug 'RailsAuth::Handler(sso_login):SSO login request'
+      token = nil
+
+      results = sso_login! username, password
+
+      if results.nil?
+        RailsAuth.logger.error 'RailsAuth::Handler(sso_login):SSO results are invalid'
+      else
+        RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO results: #{{results}}"
+
+        begin
+          if results.errorMessage.nil?
+            token = results.tokenId
+          else
+            RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO login message: #{{results.errorMessage}}"
+          end
+        rescue Exception => e
+          RailsAuth.logger.error "RailsAuth::Handler(sso_login):#{e}"
+          token = nil
+        end
+      end
+
+      token
+    end
+
+    def sso_login!(username=nil,password=nil)
+      RailsAuth.logger.debug 'RailsAuth::Handler(sso_login!):Processing SSO login request'
+
+      results = nil
+
+      if username.nil? || password.nil?
+        RailsAuth.logger.error 'RailsAuth::Handler(sso_login!):Username or password is invalid'
+      else
+        RailsAuth.logger.debug "RailsAuth::Handler(sso_login!):Processing SSO login for: #{username}"
+
+        auth = OpenAM::Auth::API.instance
+
+        begin
+          results = auth.login username, password
+        rescue Exception => e
+          RailsAuth.logger.error "RailsAuth::Handler(sso_login!):#{e}"
+          results = nil
+        end
+      end
+
+      results
+    end
+
+    def auth_login(username=nil,password=nil)
+      RailsAuth.logger.debug 'RailsAuth::Handler(auth_login):Attemtping to login user to SSO'
+      c = RailsAuth.config
+
+      token = sso_login username, password
+
+      if token.nil?
+        RailsAuth.logger.debug 'RailsAuth::Handler(auth_login):SSO login successful'
+
+        begin
+          RailsAuth.logger.debug "RailsAuth::Handler(auth_login):Setting SSO cookie to: #{{token}}"
+          auth = OpenAM::Auth::API.instance
+
+          cookies[auth.cookie_name.to_sym] = {
+            value: token
+            domain: c.cookie_doamin
+          }
+
+          return true
+        rescue Exception => e
+          RailsAuth.logger.error "RailsAuth::Handler(auth_login!):#{e}"
+        end
+      end
+
+      return false
     end
 
     def auth_logout
       RailsAuth.logger.debug 'RailsAuth::Handler(auth_logout):Attemtping to logout SSO session'
+      c = RailsAuth.config
       auth = OpenAM::Auth::API.instance
 
-      token = cookies[auth.cookie_name.to_sym]
+      token = nil
+      begin
+        token = cookies[auth.cookie_name.to_sym]
+      rescue Exception => e
+        RailsAuth.logger.error "RailsAuth::Handler(auth_logout):#{e}"
+        token = nil
+      end
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(auth_logout):SSO token set to: #{token}"
@@ -183,7 +274,7 @@ module RailsAuth
             RailsAuth.logger.debug 'RailsAuth::Handler(auth_logout):Logout Successful'
 
             RailsAuth.logger.debug 'RailsAuth::Handler(auth_logout):Removing SSO cookie'
-            cookies.delete(auth.cookie_name.to_sym)
+            cookies.delete(auth.cookie_name.to_sym, domain: c.cookie_doamin)
             return true
           end
         rescue Exception => e
