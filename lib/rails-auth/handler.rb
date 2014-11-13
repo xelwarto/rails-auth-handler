@@ -29,9 +29,13 @@ module RailsAuth
             if id.nil?
               RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session user id not found'
 
-              build_session sso_id
+              if c.session_builder
+                build_session sso_id
+              else
+                session[c.session_user.to_sym] = sso_id
+              end
+              
               id = session[c.session_user.to_sym]
-
               if id.nil?
                 RailsAuth.logger.error "RailsAuth::Handler(verify_auth):session information is invalid for: #{sso_id}"
                 send_error
@@ -40,8 +44,10 @@ module RailsAuth
               end
             else
               if id == sso_id
-                build_session sso_id if session[c.session_dn.to_sym].nil?
-                build_session sso_id if session[c.session_mail.to_sym].nil?
+                if c.session_builder
+                  build_session sso_id if session[c.session_dn.to_sym].nil?
+                  build_session sso_id if session[c.session_mail.to_sym].nil?
+                end
 
                 id = session[c.session_user.to_sym]
                 if id.nil?
