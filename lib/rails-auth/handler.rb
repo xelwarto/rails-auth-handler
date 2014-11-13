@@ -240,7 +240,7 @@ module RailsAuth
         RailsAuth.logger.debug 'RailsAuth::Handler(auth_login):SSO login successful'
 
         begin
-          RailsAuth.logger.debug "RailsAuth::Handler(auth_login):Setting SSO cookie to: #{{token}}"
+          RailsAuth.logger.debug "RailsAuth::Handler(auth_login):Setting SSO cookie to: #{token}"
           auth = OpenAM::Auth::API.instance
 
           cookies[auth.cookie_name.to_sym] = {
