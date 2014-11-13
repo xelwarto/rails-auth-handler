@@ -29,7 +29,7 @@ module RailsAuth
             if id.nil?
               RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session user id not found'
 
-              ###build_session sso_id
+              build_session sso_id
               id = session[c.session_user.to_sym]
 
               if id.nil?
@@ -40,8 +40,8 @@ module RailsAuth
               end
             else
               if id == sso_id
-                #build_session sso_id if session[c.session_dn.to_sym].nil?
-                #build_session sso_id if session[c.session_mail.to_sym].nil?
+                build_session sso_id if session[c.session_dn.to_sym].nil?
+                build_session sso_id if session[c.session_mail.to_sym].nil?
 
                 id = session[c.session_user.to_sym]
                 if id.nil?
@@ -67,13 +67,48 @@ module RailsAuth
     end
 
     def build_session(id=nil)
-      RailsAuth.logger.debug "RailsAuth::Handler(verify_auth):Building user session information for: #{id}"
+      RailsAuth.logger.debug "RailsAuth::Handler(build_session):Building user session information for: #{id}"
       c = RailsAuth.config
 
       session[c.session_user.to_sym] = nil
       session[c.session_dn.to_sym] = nil
       session[c.session_mail.to_sym] = nil
 
+      if id.nil?
+        RailsAuth.logger.error 'RailsAuth::Handler(build_session):session id is invalid'
+      else
+        begin
+          RailsAuth.logger.debug 'RailsAuth::Handler(build_session):Searching LDAP for user information'
+          Ext::LDAP.user_from_uid uid: id, attributes: ['uid','mail'] do |ent|
+            if !ent.nil?
+
+              if !ent.dn.nil?
+                session[c.session_dn.to_sym] = ent.dn.to_s
+              else
+                rasie Exception.new "LDAP account DN invalid for: #{id}"
+              end
+
+              if !ent.first(:mail).nil?
+                session[c.session_mail.to_sym] = ent.first(:mail).to_s
+              else
+                rasie Exception.new "LDAP account email address invalid for: #{id}"
+              end
+
+              if !ent.first(:uid).nil?
+                session[c.session_user.to_sym] = ent.first(:uid).to_s
+              else
+                rasie Exception.new "LDAP account user id invalid for: #{id}"
+              end
+
+            end
+          end
+        rescue Exception => e
+          RailsAuth.logger.error "RailsAuth::Handler(build_session):#{e}"
+          session[c.session_user.to_sym] = nil
+          session[c.session_dn.to_sym] = nil
+          session[c.session_mail.to_sym] = nil
+        end
+      end
     end
 
     def verify_token

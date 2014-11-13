@@ -1,4 +1,5 @@
 require 'openam/auth'
+require 'ext/ldap'
 
 require 'rails-auth/version'
 require 'rails-auth/handler'
