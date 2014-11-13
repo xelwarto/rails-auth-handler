@@ -13,10 +13,6 @@ module RailsAuth
         @u_defined = {}
       end
 
-			def openam
-				@openam ||= OpenAM::Auth.config
-			end
-
       def udefine(name, *opts)
         if !name.nil?
           name = name.to_s
