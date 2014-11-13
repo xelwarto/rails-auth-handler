@@ -190,13 +190,13 @@ module RailsAuth
       if results.nil?
         RailsAuth.logger.error 'RailsAuth::Handler(sso_login):SSO results are invalid'
       else
-        RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO results: #{{results}}"
+        RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO results: #{results}"
 
         begin
           if results.errorMessage.nil?
             token = results.tokenId
           else
-            RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO login message: #{{results.errorMessage}}"
+            RailsAuth.logger.error "RailsAuth::Handler(sso_login):SSO login message: #{results.errorMessage}"
           end
         rescue Exception => e
           RailsAuth.logger.error "RailsAuth::Handler(sso_login):#{e}"
