@@ -30,8 +30,11 @@ module RailsAuth
               RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session user id not found'
 
               if c.session_builder
+                RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session builder enabled'
                 build_session sso_id
               else
+                RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session builder disabled'
+                RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):setting session id to SSO is'
                 session[c.session_user.to_sym] = sso_id
               end
               
@@ -45,6 +48,7 @@ module RailsAuth
             else
               if id == sso_id
                 if c.session_builder
+                  RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):session builder enabled'
                   build_session sso_id if session[c.session_dn.to_sym].nil?
                   build_session sso_id if session[c.session_mail.to_sym].nil?
                 end
