@@ -244,7 +244,7 @@ module RailsAuth
           auth = OpenAM::Auth::API.instance
 
           cookies[auth.cookie_name.to_sym] = {
-            value: token
+            value: token,
             domain: c.cookie_doamin
           }
 
