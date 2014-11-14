@@ -26,7 +26,7 @@ module RailsAuth
         
         t_handlers.each do |handler|
           if handler.eql? :header
-            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in request header'
+            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Attempting to locate token in request header'
             begin
               token = request.headers[auth.cookie_name]
               break if !token.nil?
@@ -35,7 +35,7 @@ module RailsAuth
               token = nil
             end
           elsif handler.eql? :cookie
-            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in cookie'
+            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Attempting to locate token in cookie'
             begin
               token = cookies[auth.cookie_name.to_sym]
               break if !token.nil?
