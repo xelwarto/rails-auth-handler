@@ -11,24 +11,41 @@ module RailsAuth
       if c.token_handler.nil?
         RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
       else
-        if c.token_handler.eql? :header
-          RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in request header'
-          begin
-            token = request.headers[auth.cookie_name]
-          rescue Exception => e
-            RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
-            token = nil
+        t_handlers = []
+        
+        begin
+          if c.token_handler.instance_of? Array
+            t_handlers << c.token_handler
+          else
+            t_handlers.push c.token_handler
           end
-        elsif c.token_handler.eql? :cookie
-          RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in cookie'
-          begin
-            token = cookies[auth.cookie_name.to_sym]
-          rescue Exception => e
-            RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
-            token = nil
+        rescue Exception => e
+          RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
+          t_handlers = []
+        end
+        
+        t_handlers.each do |handler|
+          if handler.eql? :header
+            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in request header'
+            begin
+              token = request.headers[auth.cookie_name]
+              break if !token.nil?
+            rescue Exception => e
+              RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
+              token = nil
+            end
+          elsif handler.eql? :cookie
+            RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in cookie'
+            begin
+              token = cookies[auth.cookie_name.to_sym]
+              break if !token.nil?
+            rescue Exception => e
+              RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
+              token = nil
+            end
+          else
+            RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
           end
-        else
-          RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
         end
       end
       
