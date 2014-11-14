@@ -13,15 +13,14 @@ module RailsAuth
       else
         t_handlers = []
 
-puts c.token_handler.class
         begin
           if c.token_handler.instance_of? Array
-puts "HERE"
             t_handlers << c.token_handler
           else
-puts "HERE2"
             t_handlers.push c.token_handler
           end
+          
+          t_handlers.flatten!
         rescue Exception => e
           RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
           t_handlers = []
