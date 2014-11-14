@@ -44,7 +44,7 @@ module RailsAuth
               token = nil
             end
           else
-            RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
+            RailsAuth.logger.error "RailsAuth::Handler(get_token):Configured token handler method is invalid: #{handler}"
           end
         end
       end
