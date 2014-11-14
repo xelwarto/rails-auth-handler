@@ -1,6 +1,39 @@
 
 module RailsAuth
   module Handler
+  
+    def get_token
+      RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Attempting to locate SSO token'
+      c = RailsAuth.config
+      auth = OpenAM::Auth::API.instance
+      token = nil
+      
+      if c.token_handler.nil?
+        RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
+      else
+        if c.token_handler.eql? :header
+          RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in request header'
+          begin
+            token = request.headers[auth.cookie_name]
+          rescue Exception => e
+            RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
+            token = nil
+          end
+        elsif c.token_handler.eql? :cookie
+          RailsAuth.logger.debug 'RailsAuth::Handler(get_token):Configured to locate token in cookie'
+          begin
+            token = cookies[auth.cookie_name.to_sym]
+          rescue Exception => e
+            RailsAuth.logger.error "RailsAuth::Handler(get_token):#{e}"
+            token = nil
+          end
+        else
+          RailsAuth.logger.error 'RailsAuth::Handler(get_token):Configured token handler method is invalid'
+        end
+      end
+      
+      token
+    end
 
     def verify_auth
       RailsAuth.logger.debug 'RailsAuth::Handler(verify_auth):Authenticating user request'
@@ -126,13 +159,7 @@ module RailsAuth
       auth = OpenAM::Auth::API.instance
 
       token_valid = false
-      token = nil
-      begin
-        token = cookies[auth.cookie_name.to_sym]
-      rescue Exception => e
-        RailsAuth.logger.error "RailsAuth::Handler(verify_token):#{e}"
-        token = nil
-      end
+      token = get_token
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(verify_token):SSO token set to: #{token}"
@@ -154,13 +181,7 @@ module RailsAuth
       auth = OpenAM::Auth::API.instance
 
       sso_id = nil
-      token = nil
-      begin
-        token = cookies[auth.cookie_name.to_sym]
-      rescue Exception => e
-        RailsAuth.logger.error "RailsAuth::Handler(verify_user):#{e}"
-        token = nil
-      end
+      token = get_token
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(verify_user):SSO token set to: #{token}"
@@ -266,13 +287,7 @@ module RailsAuth
       c = RailsAuth.config
       auth = OpenAM::Auth::API.instance
 
-      token = nil
-      begin
-        token = cookies[auth.cookie_name.to_sym]
-      rescue Exception => e
-        RailsAuth.logger.error "RailsAuth::Handler(auth_logout):#{e}"
-        token = nil
-      end
+      token = get_token
 
       if !token.nil?
         RailsAuth.logger.debug "RailsAuth::Handler(auth_logout):SSO token set to: #{token}"

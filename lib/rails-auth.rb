@@ -27,6 +27,7 @@ RailsAuth.configure do |c|
 
 	c.cookie_doamin 	= nil
 	c.session_builder = true
+	c.token_handler   = :cookie
 
 	c.dev_mode 				= false
 	c.dev_user 				= nil
